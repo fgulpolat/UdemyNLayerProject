@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UdemyNLayerProject.Core.Models;
+using UdemyNLayerProject.Data.Configurations;
 
 namespace UdemyNLayerProject.Data
 {
@@ -19,7 +20,9 @@ namespace UdemyNLayerProject.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
+            modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductConfiguration());
         }
     }
 }

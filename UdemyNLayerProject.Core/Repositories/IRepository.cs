@@ -14,7 +14,7 @@ namespace UdemyNLayerProject.Core.Repositories
 
         Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate);
 
-        Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TEntity>> Where(Expression<Func<TEntity, bool>> predicate);
 
         Task AddAsync(TEntity entity);
 

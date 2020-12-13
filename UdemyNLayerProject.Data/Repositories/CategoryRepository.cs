@@ -14,7 +14,7 @@ namespace UdemyNLayerProject.Data.Repositories
 
         
 
-        public CategoryRepository(DbContext dbContext) : base(dbContext)
+        public CategoryRepository(AppDbContext dbContext) : base(dbContext)
         {
            // appDbContext =  dbContext;
         }

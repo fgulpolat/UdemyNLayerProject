@@ -9,7 +9,7 @@ namespace UdemyNLayerProject.Core.Services
 {
    public interface IProductService: IService<Product>
     {
-        Task<IEnumerable<Product>> GetWithCategoryByIdAsync (int productId);
+        Task<Product> GetWithCategoryByIdAsync (int productId);
 
     }
 }

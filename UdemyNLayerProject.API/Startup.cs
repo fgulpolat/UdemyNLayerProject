@@ -11,9 +11,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using UdemyNLayerProject.Core.Repositories;
+using UdemyNLayerProject.Core.Services;
 using UdemyNLayerProject.Core.UnitOfWork;
 using UdemyNLayerProject.Data;
+using UdemyNLayerProject.Data.Repositories;
 using UdemyNLayerProject.Data.UnitOfWork;
+using UdemyNLayerProject.Service.Services;
 
 namespace UdemyNLayerProject.API
 {
@@ -29,6 +33,13 @@ namespace UdemyNLayerProject.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped (typeof(IRepository<>),typeof(Repository<>));
+            services.AddScoped(typeof(IService<>), typeof(Service.Services.Service<>));
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IProductService, IProductService>();
+
+            services.AddTransient<IUnitOfWork, UnitOfWork>(); 
+
             services.AddDbContext<AppDbContext>(options => 
             {
                 options.UseSqlServer(Configuration["ConnectionString:SqlConStr"].ToString(), o =>
@@ -37,7 +48,7 @@ namespace UdemyNLayerProject.API
                 });
             });
 
-            services.AddTransient<IUnitOfWork,UnitOfWork>();
+          
             services.AddControllers();
         }
 

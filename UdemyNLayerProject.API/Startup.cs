@@ -36,7 +36,7 @@ namespace UdemyNLayerProject.API
             services.AddScoped (typeof(IRepository<>),typeof(Repository<>));
             services.AddScoped(typeof(IService<>), typeof(Service.Services.Service<>));
             services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IProductService, IProductService>();
+            services.AddScoped<IProductService, ProductService>();
 
             services.AddTransient<IUnitOfWork, UnitOfWork>(); 
 

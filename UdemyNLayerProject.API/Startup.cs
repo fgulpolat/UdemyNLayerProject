@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using UdemyNLayerProject.API.DTOs;
+using UdemyNLayerProject.API.Filters;
 using UdemyNLayerProject.Core.Repositories;
 using UdemyNLayerProject.Core.Services;
 using UdemyNLayerProject.Core.UnitOfWork;
@@ -33,11 +39,14 @@ namespace UdemyNLayerProject.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
             services.AddScoped (typeof(IRepository<>),typeof(Repository<>));
             services.AddScoped(typeof(IService<>), typeof(Service.Services.Service<>));
+            services.AddScoped<NotFoundFilter>();
+
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
-
+           
             services.AddTransient<IUnitOfWork, UnitOfWork>(); 
 
             services.AddDbContext<AppDbContext>(options => 
@@ -48,6 +57,11 @@ namespace UdemyNLayerProject.API
                 });
             });
 
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
           
             services.AddControllers();
         }
@@ -59,6 +73,26 @@ namespace UdemyNLayerProject.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseExceptionHandler(config =>
+            {
+                config.Run(async context =>
+                {
+                    context.Response.StatusCode = 500;
+                    context.Response.ContentType = "application/json";
+                    var error = context.Features.Get<IExceptionHandlerFeature>();
+
+                    if (error!=null)
+                    {
+                        var ex = error.Error;
+
+                        ErrorDto errorDto = new ErrorDto();
+                        errorDto.Status = 500;
+                        errorDto.Errors.Add(ex.Message);
+
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(errorDto));
+                    }
+                });
+            });
 
             app.UseHttpsRedirection();
 

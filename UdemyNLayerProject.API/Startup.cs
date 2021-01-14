@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using UdemyNLayerProject.API.DTOs;
+using UdemyNLayerProject.API.ExtensionMethods;
 using UdemyNLayerProject.API.Filters;
 using UdemyNLayerProject.Core.Repositories;
 using UdemyNLayerProject.Core.Services;
@@ -73,26 +74,8 @@ namespace UdemyNLayerProject.API
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseExceptionHandler(config =>
-            {
-                config.Run(async context =>
-                {
-                    context.Response.StatusCode = 500;
-                    context.Response.ContentType = "application/json";
-                    var error = context.Features.Get<IExceptionHandlerFeature>();
 
-                    if (error!=null)
-                    {
-                        var ex = error.Error;
-
-                        ErrorDto errorDto = new ErrorDto();
-                        errorDto.Status = 500;
-                        errorDto.Errors.Add(ex.Message);
-
-                        await context.Response.WriteAsync(JsonConvert.SerializeObject(errorDto));
-                    }
-                });
-            });
+            app.UseCustomException();
 
             app.UseHttpsRedirection();
 

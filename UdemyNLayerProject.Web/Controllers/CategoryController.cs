@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using UdemyNLayerProject.Core.Models;
 using UdemyNLayerProject.Core.Services;
 using UdemyNLayerProject.Web.DTOs;
 
@@ -25,8 +26,23 @@ namespace UdemyNLayerProject.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var categories = await _categoryService.GetAllAsync();
-            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories.Where(x => x.Id == 2));
+            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
             return View(categoryDtos);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+
+       [HttpPost]
+       public async Task<IActionResult> Create(CategoryDto categoryDto)
+        {
+           var category = _mapper.Map<Category>(categoryDto);
+           await _categoryService.AddAsync(category);
+
+            return RedirectToAction("Index");
         }
     }
 }

@@ -44,5 +44,26 @@ namespace UdemyNLayerProject.Web.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Update(int Id)
+        {
+            var category = await _categoryService.GetByIdAsync(Id);
+            return View(_mapper.Map<CategoryDto>(category));
+        }
+
+        [HttpPost]
+        public IActionResult Update(CategoryDto categoryDto)
+        {
+           var category= _mapper.Map<Category>(categoryDto);
+            _categoryService.Update(category);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Delete(int Id)
+        {
+            var category =  _categoryService.GetByIdAsync(Id).Result;
+            _categoryService.Remove(category);
+            return RedirectToAction("Index");
+        }
     }
 }

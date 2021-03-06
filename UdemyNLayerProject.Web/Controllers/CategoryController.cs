@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using UdemyNLayerProject.Core.Models;
 using UdemyNLayerProject.Core.Services;
+using UdemyNLayerProject.Web.ApiService;
 using UdemyNLayerProject.Web.DTOs;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,17 +16,19 @@ namespace UdemyNLayerProject.Web.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
+        private readonly CategoryApiService _categoryApiService;
         private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryService categoryService, IMapper mapper)
+        public CategoryController(ICategoryService categoryService, IMapper mapper, CategoryApiService categoryApiService)
         {
             _categoryService = categoryService;
             _mapper = mapper;
+            _categoryApiService = categoryApiService;
         }
         // GET: /<controller>/
         public async Task<IActionResult> Index()
         {
-            var categories = await _categoryService.GetAllAsync();
+            var categories = await _categoryApiService.GetAllAsync();
             var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
             return View(categoryDtos);
         }
@@ -40,14 +43,14 @@ namespace UdemyNLayerProject.Web.Controllers
        public async Task<IActionResult> Create(CategoryDto categoryDto)
         {
            var category = _mapper.Map<Category>(categoryDto);
-           await _categoryService.AddAsync(category);
+           await _categoryApiService.AddAsync(categoryDto);
 
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Update(int Id)
         {
-            var category = await _categoryService.GetByIdAsync(Id);
+            var category = await _categoryApiService.GetByIdAsync(Id);
             return View(_mapper.Map<CategoryDto>(category));
         }
 
@@ -55,14 +58,15 @@ namespace UdemyNLayerProject.Web.Controllers
         public IActionResult Update(CategoryDto categoryDto)
         {
            var category= _mapper.Map<Category>(categoryDto);
-            _categoryService.Update(category);
+            _categoryApiService.Update(categoryDto);
             return RedirectToAction("Index");
         }
 
-        public IActionResult Delete(int Id)
+        public  async  Task<IActionResult> Delete(int Id)
         {
-            var category =  _categoryService.GetByIdAsync(Id).Result;
-            _categoryService.Remove(category);
+           
+            await _categoryApiService.Delete(Id);
+
             return RedirectToAction("Index");
         }
     }
